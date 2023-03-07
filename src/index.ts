@@ -64,6 +64,9 @@ app.get('/v1/tiles/:zoom/:x/:y', async c => {
 		return c.text('Error from proxied server')
 	}
 
+	const contentType = resp.headers.get('content-type')
+	c.header('content-type', contentType)
+
 	return c.body(resp.body, 200)
 });
 
