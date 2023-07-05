@@ -8,6 +8,7 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 import { Hono } from 'hono'
+import { cache } from 'hono/cache'
 import { cors } from 'hono/cors'
 import { etag } from 'hono/etag'
 import TileifyAGS from "tileify-ags";
@@ -16,6 +17,10 @@ const app = new Hono()
 
 app.use('/*', cors())
 app.use('/*', etag())
+app.get('/*', cache({
+	cacheName: 'ags-proxy',
+	cacheControl: 'public, max-age=604800',
+}))
 
 export interface Env {
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -28,19 +33,17 @@ export interface Env {
 	// MY_BUCKET: R2Bucket;
 }
 
-app.get('/v1/tiles/:zoom/:x/:y', async c => {
+app.get('/tiles/:zoom/:x/:y', async c => {
 	const zoom = parseInt(c.req.param('zoom'))
 	const x = parseInt(c.req.param('x'))
 	const y = parseInt(c.req.param('y'))
 	let agsUrl = c.req.query('url')
-	const pixelRatio = 2
+	const pixelRatio = 1
 
 	if (!agsUrl) {
 		c.status(400)
 		return c.text('Missing url parameter')
 	}
-
-	console.log('url query =>' + agsUrl)
 
 	agsUrl = decodeURIComponent(agsUrl)
 	console.log('url query =>' + agsUrl)
@@ -133,7 +136,7 @@ app.get('/app.js', c => {
     if (event) {
       event.preventDefault();
     }
-    var url = window.location.origin + '/v1/tiles/{z}/{x}/{y}';
+    var url = window.location.origin + '/tiles/{z}/{x}/{y}';
     var params = (function() {
       var encoded_ags_url = window.encodeURIComponent($('#ags_url').val());
       var key_vals = ['url=' + encoded_ags_url];
