@@ -18,63 +18,63 @@ const app = new Hono()
 app.use('/*', cors())
 app.use('/*', etag())
 app.get('/*', cache({
-	cacheName: 'ags-proxy',
-	cacheControl: 'public, max-age=604800',
+    cacheName: 'ags-proxy',
+    cacheControl: 'public, max-age=604800',
 }))
 
 export interface Env {
-	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-	// MY_KV_NAMESPACE: KVNamespace;
-	//
-	// Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
-	// MY_DURABLE_OBJECT: DurableObjectNamespace;
-	//
-	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
-	// MY_BUCKET: R2Bucket;
+    // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
+    // MY_KV_NAMESPACE: KVNamespace;
+    //
+    // Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
+    // MY_DURABLE_OBJECT: DurableObjectNamespace;
+    //
+    // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
+    // MY_BUCKET: R2Bucket;
 }
 
 app.get('/tiles/:zoom/:x/:y', async c => {
-	const zoom = parseInt(c.req.param('zoom'))
-	const x = parseInt(c.req.param('x'))
-	const y = parseInt(c.req.param('y'))
-	let agsUrl = c.req.query('url')
-	const pixelRatio = 1
+    const zoom = parseInt(c.req.param('zoom'))
+    const x = parseInt(c.req.param('x'))
+    const y = parseInt(c.req.param('y'))
+    let agsUrl = c.req.query('url')
+    const pixelRatio = 1
 
-	if (!agsUrl) {
-		c.status(400)
-		return c.text('Missing url parameter')
-	}
+    if (!agsUrl) {
+        c.status(400)
+        return c.text('Missing url parameter')
+    }
 
-	agsUrl = decodeURIComponent(agsUrl)
-	console.log('url query =>' + agsUrl)
+    agsUrl = decodeURIComponent(agsUrl)
+    console.log('url query =>' + agsUrl)
 
-	const agsParams = {
-		transparent: 'true',
-	}
+    const agsParams = {
+        transparent: 'true',
+    }
 
-	const tiler = new TileifyAGS(agsUrl, agsParams, pixelRatio)
-	const url = tiler.getTileUrl(x, y, zoom)
-	console.log(`For tile ${zoom}/${x}/${y} => url ${url}`)
+    const tiler = new TileifyAGS(agsUrl, agsParams, pixelRatio)
+    const url = tiler.getTileUrl(x, y, zoom)
+    console.log(`For tile ${zoom}/${x}/${y} => url ${url}`)
 
-	const resp = await fetch(url, {
-		signal: AbortSignal.timeout(10000),
-	})
+    const resp = await fetch(url, {
+        signal: AbortSignal.timeout(10000),
+    })
 
-	console.log(`Response from server: HTTP ${resp.status}`)
+    console.log(`Response from server: HTTP ${resp.status}`)
 
-	if (resp.status != 200 || !resp.body) {
-		c.status(503)
-		return c.text('Error from proxied server')
-	}
+    if (resp.status != 200 || !resp.body) {
+        c.status(503)
+        return c.text('Error from proxied server')
+    }
 
-	const contentType = resp.headers.get('content-type')
-	c.header('content-type', contentType)
+    const contentType = resp.headers.get('content-type')
+    c.header('content-type', contentType)
 
-	return c.body(resp.body, 200)
+    return c.body(resp.body, 200)
 });
 
 app.get('/app.css', c => {
-	const css = `html, body {
+    const css = `html, body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -116,11 +116,11 @@ app.get('/app.css', c => {
   float: right;
 }`
 
-	return c.text(css, 200, {'content-type': 'text/css'});
+    return c.text(css, 200, {'content-type': 'text/css'});
 })
 
 app.get('/app.js', c => {
-	const js = `(function(){
+    const js = `(function(){
   var base_layer = new L.TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
   var map_options = {
     center: [40.203,-95.382],
@@ -165,11 +165,11 @@ app.get('/app.js', c => {
   updateLayer();
 }());`
 
-	return c.text(js, 200, {'content-type': 'text/javascript'})
+    return c.text(js, 200, {'content-type': 'text/javascript'})
 })
 
 app.get('/', c => {
-	const template = `<!DOCTYPE html>
+    const template = `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -178,9 +178,9 @@ app.get('/', c => {
     <meta name="description" content="ArcGIS Server Proxy - Fetch slippy map tiles from an uncached ArcGIS Server map">
     <meta name="author" content="OpenStreetMap US">
     <title>ArcGIS Server Proxy</title>
-     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-     		integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
-     		crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H"
+             crossorigin=""/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="app.css">
   </head>
@@ -242,14 +242,14 @@ app.get('/', c => {
       <div id="map"></div>
     </div>
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-			 integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
-			 crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+             integrity="sha384-4aETf8z71hiSsoK0xYsa5JtiJHfL3h7uMAsZ2QYOLvcySDL/cEDfdLt0SaBypTQZ"
+             crossorigin=""></script>
     <script src="app.js"></script>
   </body>
 </html>`
 
-	return c.html(template)
+    return c.html(template)
 });
 
 export default app
