@@ -73,6 +73,10 @@ app.get('/tiles/:zoom/:x/:y', async c => {
     return c.body(resp.body, 200)
 });
 
+app.get('/favicon.ico', c => {
+    return c.status(404);
+});
+
 app.get('/app.css', c => {
     const css = `html, body {
   margin: 0;
