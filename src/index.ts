@@ -74,7 +74,7 @@ app.get('/tiles/:zoom/:x/:y', async c => {
 });
 
 app.get('/favicon.ico', c => {
-    return c.status(404);
+    return c.notFound();
 });
 
 app.get('/app.css', c => {
