@@ -38,7 +38,10 @@ app.get('/tiles/:zoom/:x/:y', async c => {
     const x = parseInt(c.req.param('x'))
     const y = parseInt(c.req.param('y'))
     let agsUrl = c.req.query('url')
-    const pixelRatio = 1
+
+    // Parse the pixel ratio (default to 1 if not provided)
+    const pixelRatioParam = c.req.query('r')
+    const pixelRatio = pixelRatioParam ? parseInt(pixelRatioParam) : 1
 
     if (!agsUrl) {
         c.status(400)
@@ -54,7 +57,7 @@ app.get('/tiles/:zoom/:x/:y', async c => {
 
     const tiler = new TileifyAGS(agsUrl, agsParams, pixelRatio)
     const url = tiler.getTileUrl(x, y, zoom)
-    console.log(`For tile ${zoom}/${x}/${y} => url ${url}`)
+    console.log(`For tile ${zoom}/${x}/${y}@${pixelRatio} => url ${url}`)
 
     const resp = await fetch(url, {
         signal: AbortSignal.timeout(10000),
