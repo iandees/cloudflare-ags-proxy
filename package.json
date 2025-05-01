@@ -2,17 +2,17 @@
   "name": "cloudflare-ags-proxy",
   "version": "0.0.0",
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20230228.0",
+    "@cloudflare/workers-types": "^4.20250430.0",
     "typescript": "^4.9.5",
-    "wrangler": "^2.12.0"
+    "wrangler": "^4.13.2"
   },
   "private": true,
   "scripts": {
     "start": "wrangler dev",
-    "deploy": "wrangler publish"
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "hono": "^3.0.3",
+    "hono": "^4.7.8",
     "tileify-ags": "^2.1.0"
   }
 }
