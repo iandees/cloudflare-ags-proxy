@@ -12,7 +12,7 @@
     "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "hono": "^4.12.26",
+    "hono": "^4.12.30",
     "tileify-ags": "^2.1.0"
   }
 }
