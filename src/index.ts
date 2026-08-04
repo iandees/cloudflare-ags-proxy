@@ -10,13 +10,11 @@
 import { Hono } from 'hono'
 import { cache } from 'hono/cache'
 import { cors } from 'hono/cors'
-import { etag } from 'hono/etag'
 import TileifyAGS from "tileify-ags";
 
 const app = new Hono()
 
 app.use('/*', cors())
-app.use('/*', etag())
 app.get('/*', cache({
     cacheName: 'ags-proxy',
     cacheControl: 'public, max-age=604800',
